@@ -6,7 +6,8 @@ const fs = require('fs')
 const path = require('path') 
 const ejs = require('ejs')
 const fsp = require('fs/promises')
-const htmlDir = 'public/templates'
+const cron = require('cron')
+const htmlDir = process.env.HTMLDIR || 'public/templates'
 const createCourse = asyncWrapper(async (req, res) => {
   const { courseId, duration, instructor, startDate, end, fee, username } = req.body;
   const file = req.files
@@ -28,10 +29,11 @@ const createCourse = asyncWrapper(async (req, res) => {
 const getCourses = asyncWrapper(async (req, res) => {
   const courses = await Course.find({}).sort({ createdAt: -1 });
 
+  const totalCourse = courses.length
   if (!courses) {
     res.status(HTTP_STATUS_CODES.NOT_FOUND).json({});
   }
-  res.status(HTTP_STATUS_CODES.OK).json({ courses });
+  res.status(HTTP_STATUS_CODES.OK).json({ totalCourse, courses });
 });
 
 const getSingleCourse = asyncWrapper(async (req, res) => {
@@ -123,6 +125,7 @@ const getCourseStats = asyncWrapper(async (req, res) => {
   }
 });
 
+// Generate PDF file
 const generatePdf = async function(course){
   console.log("Course Data", course);
   const tempFileName = `${course.username}-${Date.now()}-${Math.ceil(Math.random() * 1000)}`;
@@ -156,9 +159,29 @@ const generatePdf = async function(course){
     console.log(error)
     return {messaghe: "Error while generating PDF:"}
   }
-  
+
 };
 
+const readFiles = async function(){
+  const pdfFolder = path.join(__dirname,'..', '/public/pdf')
+  console.log("Reading filenames", pdfFolder)
+  fs.readdir(pdfFolder, function(err, filenames) {
+    if (err) {
+      return console.log('Unable to scan directory:'+ err);
+    }
+    console.log("filenames", filenames)
+    filenames.forEach(function(filename) {
+      console.log("Content", filename)
 
+      fs.readFile(pdfFolder + filename, 'utf-8', function(err, content) {
+        if (err) {
+          // console.log('Error reading file: ', err);
+          return;
+        }
+      });
+    });
+  })
+}
+//readFiles()
 
 module.exports = { createCourse, getCourses, getSingleCourse, partiallyUpdateCourse, updateCourse,deleteCourse, getCourseStats};

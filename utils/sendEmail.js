@@ -119,7 +119,6 @@ const sendContactUsEmail = async (email, name, message) => {
   };
   
   module.exports = {
-    sendVerificationEmail,
     sendForgotPasswordEmail,
     sendNewsletterConfirmationEmail,
     sendContactUsEmail,
