@@ -10,24 +10,10 @@ const cors = require('cors');
 const morgan = require("morgan");
 const { getCourseStats } = require("./controllers/courseController");
 const authRoutes = require("./routes/authRoutes")
-const errorHandler = require("./middleware/errorHandler");
+// const errorHandler = require("./middleware/errorHandler");
+const corsOptions = require("./config/corsOptions")
+const logger = require("./utils/winston")
 // cors whitelist
-const whitelist = [
-  'http://localhost:5000',
-  'http://localhost:4200',
-  'http://localhost:3000'
-]
-const corsOptions = {
-  origin: function(origin, callback) {
-    if (whitelist.indexOf(origin)!== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200 
-}
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -44,12 +30,14 @@ app.use('/api/v1', studentssRoutes)
 const port = process.env.PORT || 5000;
 
 // Error handling
-app.use(errorHandler());
+// app.use(errorHandler());
 const server = async () => {
     try {
       await connectDB();
       app.listen(port, console.log(`Server running on Port: ${port}`));
+      logger.info("`Server running on Port: ${port}`")
     } catch (error) {
+      logger.error("Error connecting")
       console.log("");
     }
   };
