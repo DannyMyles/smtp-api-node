@@ -5,8 +5,8 @@ const asyncWrapper = require('../../middleware/asyncWrapper')
 const HTTP_STATUS_CODES = require('../../utils/statusCodes')
 const jwt = require('jsonwebtoken')
 const { sendVerificationEmail } = require('../../utils/sendEmail')
-
-
+const logger = require("../../utils/winston")
+const statusCodes = require('../../utils/statusCodes')
 // Signup User
 const signUp = asyncWrapper(async (req, res) => {
   try {
@@ -109,17 +109,16 @@ const signUp = asyncWrapper(async (req, res) => {
         const token = jwt.sign({ user_id: newUser }, process.env.JWT_SECRET, {
           expiresIn: "5m",
         });
-
+        
         await User.findOneAndUpdate(
           { _id: newUser._id },
           { verifyToken: token },
           { new: true, runValidators: false, useFindAndModify: false }
         );
       }
-
+      
       // Send Email
       // await sendVerificationEmail(email, token);
-
       return helper.sendSuccess(res, "Email sent", req, "Success");
     } else if (method === "custom_phone") {
       const userData = req.body;
@@ -229,13 +228,14 @@ const signUp = asyncWrapper(async (req, res) => {
         return helper.sendError(400, res, { error: "Invalid method" }, req);
       }
     }
+    res.status()
   } catch (error) {
     console.error(error);
     return helper.sendError(500, res, { error: "An error occurred" }, req);
   }
 });
 
-const login = asyncWrapper(async (req, res) => {
+const logIn = asyncWrapper(async (req, res) => {
   const { email, password, method, mobile, rememberMe } = req.body;
   if (!method) {
     return helper.sendError(
@@ -277,14 +277,14 @@ const login = asyncWrapper(async (req, res) => {
     if (!isPasswordMatched)
       return helper.sendError(403, res, { error: "Invalid Credentials" }, req);
 
-    if (!user.emailVerified) {
-      return helper.sendError(
-        403,
-        res,
-        { error: "Please verify your email" },
-        req
-      );
-    }
+    // if (!user.emailVerified) {
+    //   return helper.sendError(
+    //     403,
+    //     res,
+    //     { error: "Please verify your email" },
+    //     req
+    //   );
+    // }
 
     await User.findOneAndUpdate(
       {
@@ -299,9 +299,10 @@ const login = asyncWrapper(async (req, res) => {
     );
 
     createSession(user, req, res, rememberMe);
-  } })
+  }
+});
 
-  // const logout = catchAsyncFunc(async (req, res, next) => {
+  // const logout = asyncWrapper(async (req, res, next) => {
   //   const authHeader = req.get("Authorization");
   //   if (!authHeader)
   //     return helper.sendError(
@@ -317,4 +318,4 @@ const login = asyncWrapper(async (req, res) => {
   
   //   return helper.sendSuccess(res, result, req, "Success");
   // });
-module.exports = { signUp, login }
+module.exports = { signUp, logIn }

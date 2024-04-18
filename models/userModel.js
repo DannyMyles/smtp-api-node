@@ -90,11 +90,6 @@ const schema = new Schema(
       min: [1, "Age should be greater than 0."],
       max: [100, "Age should be less than 110."],
     },
-    fcmToken: {
-      type: Schema.Types.String,
-      required: false,
-      default: "",
-    },
     country: {
       type: String,
     },
@@ -129,11 +124,6 @@ const schema = new Schema(
     rememberMe: {
       type: Schema.Types.Boolean,
       default: false,
-    },
-    paymentHistory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PaymentHistory",
-      required: false,
     },
     about: {
       type: String,
