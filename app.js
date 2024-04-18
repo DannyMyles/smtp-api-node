@@ -35,7 +35,6 @@ const server = async () => {
     try {
       await connectDB();
       app.listen(port, console.log(`Server running on Port: ${port}`));
-      logger.info("`Server running on Port: ${port}`")
     } catch (error) {
       logger.error("Error connecting")
       console.log("");

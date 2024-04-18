@@ -1,4 +1,4 @@
-const helper = require('./../../helpers/helpers')
+const helper = require('../../helpers/helpers')
 const User = require('../../models/userModel')
 const bcrypt = require('bcryptjs')
 const asyncWrapper = require('../../middleware/asyncWrapper')

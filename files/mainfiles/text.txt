@@ -1,1 +1,0 @@
-This is the content that  I need to read using Node js fs.

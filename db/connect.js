@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 require('dotenv').config()
 const logger = require("../utils/winston")
+
 const connectDB = async () =>{
     try {
         await mongoose.connect(process.env.DB_URL)

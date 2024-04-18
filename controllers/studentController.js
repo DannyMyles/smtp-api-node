@@ -109,6 +109,22 @@ const deleteStudent = asyncWrapper(async (req, res) => {
   }
 });
 
+const getStudentStats = asyncWrapper(async(req,res)=>{
+  try {
+    const studentStats = await Student.aggregate([
+      {$match: { everExpelled: { $ne: true }}},
+      {$group : {
+        _id: null,
+        count: { $sum: 1 }
+      }}
+    ])
+    res
+      .status(HTTP_STATUS_CODES.OK)
+      .json({ count: stats.length, status: "success", data: {studentStats} });
+  } catch (error) {
+    res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: error });
+  }
+})
 module.exports = {
   createStudent,
   getStudents,
@@ -116,4 +132,5 @@ module.exports = {
   partiallyUpdateStudent,
   updateStudent,
   deleteStudent,
+  getStudentStats
 };

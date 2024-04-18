@@ -5,6 +5,7 @@ const {
   partiallyUpdateStudent,
   updateStudent,
   deleteStudent,
+  getStudentStats
 } = require("../controllers/studentController");
 
 const express = require("express");
@@ -17,5 +18,5 @@ router
   .put(updateStudent)
   .patch(partiallyUpdateStudent)
   .delete(deleteStudent);
-
+router.route("/studentsStats").get(getStudentStats);
 module.exports = router;
